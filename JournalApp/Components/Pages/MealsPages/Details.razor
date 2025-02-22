@@ -1,0 +1,52 @@
+﻿@page "/meals/details"
+@using Microsoft.EntityFrameworkCore
+@using JournalApp.Models
+@inject IDbContextFactory<JournalApp.Data.JournalAppContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Meals</h2>
+    <hr />
+    @if (meals is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@meals.Name</dd>
+            <dt class="col-sm-2">Thoughts</dt>
+            <dd class="col-sm-10">@meals.Thoughts</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@meals.Price</dd>
+            <dt class="col-sm-2">Rating</dt>
+            <dd class="col-sm-10">@meals.Rating</dd>
+        </dl>
+        <div>
+            <a href="@($"/meals/edit?id={meals.Id}")">Edit</a> |
+            <a href="@($"/meals")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Meals? meals;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        meals = await context.Meals.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (meals is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

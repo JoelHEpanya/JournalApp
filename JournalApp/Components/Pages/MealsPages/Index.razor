@@ -1,0 +1,39 @@
+﻿@page "/meals"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using JournalApp.Models
+@using JournalApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<JournalApp.Data.JournalAppContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="meals/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Meals">
+    <PropertyColumn Property="meals => meals.Name" />
+    <PropertyColumn Property="meals => meals.Thoughts" />
+    <PropertyColumn Property="meals => meals.Price" />
+    <PropertyColumn Property="meals => meals.Rating" />
+
+    <TemplateColumn Context="meals">
+        <a href="@($"meals/edit?id={meals.Id}")">Edit</a> |
+        <a href="@($"meals/details?id={meals.Id}")">Details</a> |
+        <a href="@($"meals/delete?id={meals.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private JournalAppContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

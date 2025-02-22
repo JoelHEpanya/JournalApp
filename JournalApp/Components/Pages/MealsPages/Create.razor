@@ -1,0 +1,59 @@
+﻿@page "/meals/create"
+@using Microsoft.EntityFrameworkCore
+@using JournalApp.Models
+@inject IDbContextFactory<JournalApp.Data.JournalAppContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Meals</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Meals" OnValidSubmit="AddMeals" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Meals.Name" class="form-control" /> 
+                <ValidationMessage For="() => Meals.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="thoughts" class="form-label">Thoughts:</label> 
+                <InputText id="thoughts" @bind-Value="Meals.Thoughts" class="form-control" /> 
+                <ValidationMessage For="() => Meals.Thoughts" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="Meals.Price" class="form-control" /> 
+                <ValidationMessage For="() => Meals.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating:</label> 
+                <InputText id="rating" @bind-Value="Meals.Rating" class="form-control" /> 
+                <ValidationMessage For="() => Meals.Rating" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/meals">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Meals Meals { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMeals()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Meals.Add(Meals);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/meals");
+    }
+}
