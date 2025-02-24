@@ -1,0 +1,99 @@
+﻿@page "/dreams/edit"
+@using Microsoft.EntityFrameworkCore
+@using JournalApp.Models
+@inject IDbContextFactory<JournalApp.Data.JournalAppContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Dreams</h2>
+<hr />
+@if (Dreams is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Dreams" OnValidSubmit="UpdateDreams" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Dreams.Id" value="@Dreams.Id" />
+                <div class="mb-3">
+                    <label for="header" class="form-label">Header:</label>
+                    <InputText id="header" @bind-Value="Dreams.Header" class="form-control" />
+                    <ValidationMessage For="() => Dreams.Header" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="note" class="form-label">Note:</label>
+                    <InputText id="note" @bind-Value="Dreams.Note" class="form-control" />
+                    <ValidationMessage For="() => Dreams.Note" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="rating" class="form-label">rating:</label>
+                    <InputNumber id="rating" @bind-Value="Dreams.rating" class="form-control" />
+                    <ValidationMessage For="() => Dreams.rating" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/dreams">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Dreams? Dreams { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Dreams ??= await context.Dreams.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Dreams is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateDreams()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Dreams!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DreamsExists(Dreams!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/dreams");
+    }
+
+    private bool DreamsExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Dreams.Any(e => e.Id == id);
+    }
+}

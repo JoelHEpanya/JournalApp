@@ -15,5 +15,7 @@ namespace JournalApp.Models
 
         public string Rating { get; set; }
 
+        public DateTime createdDate = DateTime.Now;
+
     }
 }

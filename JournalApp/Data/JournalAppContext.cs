@@ -16,5 +16,6 @@ namespace JournalApp.Data
 
         public DbSet<JournalApp.Models.Notes> Notes { get; set; } = default!;
         public DbSet<JournalApp.Models.Meals> Meals { get; set; } = default!;
+        public DbSet<JournalApp.Models.Dreams> Dreams { get; set; } = default!;
     }
 }

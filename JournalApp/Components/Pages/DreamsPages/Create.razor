@@ -1,0 +1,54 @@
+﻿@page "/dreams/create"
+@using Microsoft.EntityFrameworkCore
+@using JournalApp.Models
+@inject IDbContextFactory<JournalApp.Data.JournalAppContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Dreams</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Dreams" OnValidSubmit="AddDreams" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="header" class="form-label">Header:</label> 
+                <InputText id="header" @bind-Value="Dreams.Header" class="form-control" /> 
+                <ValidationMessage For="() => Dreams.Header" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="note" class="form-label">Note:</label> 
+                <InputText id="note" @bind-Value="Dreams.Note" class="form-control" /> 
+                <ValidationMessage For="() => Dreams.Note" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rating" class="form-label">rating:</label> 
+                <InputNumber id="rating" @bind-Value="Dreams.rating" class="form-control" /> 
+                <ValidationMessage For="() => Dreams.rating" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/dreams">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Dreams Dreams { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddDreams()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Dreams.Add(Dreams);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/dreams");
+    }
+}
