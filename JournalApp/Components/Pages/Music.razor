@@ -1,0 +1,81 @@
+﻿@page "/music-log"
+@using JournalApp.Models.LastFM
+@using JournalApp.Services
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject LastFMService LastFm
+
+<h3>Recent Tracks</h3>
+
+@if (tracks == null)
+{
+    <p>Loading...</p>
+}
+else if (tracks.Count == 0)
+{
+    <p>No recent tracks found.</p>
+}
+else
+{
+@*     <ul>
+        @foreach (var track in tracks)
+        {
+
+            <dl class="row">
+                <dt class="col-sm-2">Track Name</dt>
+                <dd class="col-sm-10">@track.Name</dd>
+                <dt class="col-sm-2">Artist</dt>
+                <dd class="col-sm-10">@track.Artist.Name</dd>
+                <dt class="col-sm-2">Url</dt>
+                <dd class="col-sm-10">@track.Url</dd>
+                <dt class="col-sm-2">Thoughts</dt>
+                <dd class="col-sm-10">@track.Thoughts</dd>
+                <dt class="col-sm-2">Rating</dt>
+                <dd class="col-sm-10">@track.Rating</dd>
+            </dl>
+            <br />
+            <button @onclick="() => SaveTrack(track)">Save</button>
+        }
+    </ul> *@
+    <QuickGrid Items ="tracks">
+        <PropertyColumn Title="Track" Property="@(t => t.Name)" />
+        <PropertyColumn Title="Artist" Property="@(t => t.Artist.Name)" />
+        <TemplateColumn Title="Link">
+            <Template Context="track">
+                <a href="@track.Url" target="_blank">🎵 Listen</a>
+            </Template>
+        </TemplateColumn>
+        <TemplateColumn Title="Rating">
+            <Template Context="track">
+                <input type="number" min="0" max="10" @bind="track.Rating" />
+            </Template>
+        </TemplateColumn>
+        <TemplateColumn Title="Notes">
+            <Template Context="track">
+                <textarea @bind="track.Notes"></textarea>
+            </Template>
+        </TemplateColumn>
+        <TemplateColumn Title="Save">
+            <Template Context="track">
+                <button @onclick="() => SaveTrack(track)">Save</button>
+            </Template>
+        </TemplateColumn>
+    </QuickGrid>
+
+
+}
+
+@code {
+    private List<Track> tracks = new(); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        tracks = await LastFm.GetRecentTracksAsync();
+    }
+
+    private void SaveTrack(Track track)
+    {
+        // Save logic (e.g., store in database or local storage)
+        Console.WriteLine($"Saved: {track.Name} - Rating: {track.Rating}, Notes: {track.Thoughts}");
+    }
+}

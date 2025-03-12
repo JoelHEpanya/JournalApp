@@ -2,12 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using JournalApp.Data;
+using JournalApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<JournalAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("JournalAppContext") ?? throw new InvalidOperationException("Connection string 'JournalAppContext' not found.")));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
+
+builder.Services.AddHttpClient<LastFMService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
