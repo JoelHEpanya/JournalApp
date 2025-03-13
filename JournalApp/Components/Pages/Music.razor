@@ -2,6 +2,8 @@
 @using JournalApp.Models.LastFM
 @using JournalApp.Services
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using Blazorise
+
 
 @inject LastFMService LastFm
 
@@ -37,36 +39,37 @@ else
             <button @onclick="() => SaveTrack(track)">Save</button>
         }
     </ul> *@
-    <QuickGrid Items ="tracks">
-        <PropertyColumn Title="Track" Property="@(t => t.Name)" />
-        <PropertyColumn Title="Artist" Property="@(t => t.Artist.Name)" />
-        <TemplateColumn Title="Link">
-            <Template Context="track">
-                <a href="@track.Url" target="_blank">🎵 Listen</a>
-            </Template>
-        </TemplateColumn>
-        <TemplateColumn Title="Rating">
-            <Template Context="track">
-                <input type="number" min="0" max="10" @bind="track.Rating" />
-            </Template>
-        </TemplateColumn>
-        <TemplateColumn Title="Notes">
-            <Template Context="track">
-                <textarea @bind="track.Notes"></textarea>
-            </Template>
-        </TemplateColumn>
-        <TemplateColumn Title="Save">
-            <Template Context="track">
-                <button @onclick="() => SaveTrack(track)">Save</button>
-            </Template>
-        </TemplateColumn>
-    </QuickGrid>
 
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Track</th>
+                <th>Artist</th>
+                <th>Link</th>
+                <th>Rating</th>
+                <th>Notes</th>
+                <th>Save</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var track in tracks)
+            {
+                <tr>
+                    <td>@track.Name</td>
+                    <td>@track.Artist.Name</td>
+                    <td><a href="@track.Url" target="_blank">🎵 Listen</a></td>
+                    <td><input type="number" min="0" max="10" @bind="track.Rating" /></td>
+                    <td><textarea @bind="track.Thoughts"></textarea></td>
+                    <td><button @onclick="() => SaveTrack(track)">Save</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
 }
 
 @code {
-    private List<Track> tracks = new(); 
+    private List<Track> tracks = new List<Track>(); 
 
     protected override async Task OnInitializedAsync()
     {
